@@ -1,0 +1,984 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 2,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 1,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "delta night"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "semi-dark-blue",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "delta day"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "semi-dark-orange",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 12,
+        "interval": "300s",
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT strftime('%s', date_time) AS epoch_time, (total_power - LAG(total_power) OVER (ORDER BY date_time))*1000/0.0833 AS delta, tariff\nFROM energy_meter\n",
+            "queryType": "time series",
+            "rawQueryText": "SELECT strftime('%s', date_time) AS epoch_time, (total_power - LAG(total_power) OVER (ORDER BY date_time))*1000/0.0833 AS delta, tariff\nFROM energy_meter\n",
+            "refId": "A",
+            "timeColumns": [
+              "epoch_time"
+            ]
+          }
+        ],
+        "title": "Power Delta ",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 1,
+            "displayName": "Daily usage",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "semi-dark-green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 18
+                },
+                {
+                  "color": "dark-red",
+                  "value": 23
+                }
+              ]
+            },
+            "unit": "kwatth"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 3,
+          "x": 12,
+          "y": 0
+        },
+        "id": 8,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {
+            "titleSize": 24,
+            "valueSize": 50
+          },
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS epoch_time, MAX(total_power) - MIN(total_power) AS daily_usage FROM energy_meter\nGROUP BY DATE(epoch_time)\nORDER BY epoch_time DESC\nLIMIT 1",
+            "queryType": "table",
+            "rawQueryText": "SELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS epoch_time, MAX(total_power) - MIN(total_power) AS daily_usage FROM energy_meter\nGROUP BY DATE(epoch_time)\nORDER BY epoch_time DESC\nLIMIT 1",
+            "refId": "A",
+            "timeColumns": [
+              "time",
+              "ts",
+              "epoch_time"
+            ]
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 2,
+            "displayName": "Daily cost",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "semi-dark-green",
+                  "value": null
+                },
+                {
+                  "color": "semi-dark-yellow",
+                  "value": 24
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 3,
+          "x": 15,
+          "y": 0
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {
+            "titleSize": 24,
+            "valueSize": 50
+          },
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "WITH delta_values AS (\nSELECT date_time, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n) \nSELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END)*1.09 + SUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END)*1.09\nFROM delta_values\nGROUP BY DATE(ts)\nORDER BY ts DESC\nLIMIT 1\n",
+            "queryType": "table",
+            "rawQueryText": "WITH delta_values AS (\nSELECT date_time, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n) \nSELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END)*1.09 + SUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END)*1.09\nFROM delta_values\nGROUP BY DATE(ts)\nORDER BY ts DESC\nLIMIT 1\n",
+            "refId": "A",
+            "timeColumns": [
+              "time",
+              "ts"
+            ]
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 0,
+            "displayName": "Total power",
+            "fieldMinMax": false,
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "kwatth"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 3,
+          "x": 18,
+          "y": 0
+        },
+        "id": 7,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "horizontal",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {
+            "titleSize": 24,
+            "valueSize": 50
+          },
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT total_power-5667.54 FROM energy_meter\nORDER BY date_time DESC\nLIMIT 1",
+            "queryType": "table",
+            "rawQueryText": "SELECT total_power-5667.54 FROM energy_meter\nORDER BY date_time DESC\nLIMIT 1",
+            "refId": "A",
+            "timeColumns": [
+              "time",
+              "ts"
+            ]
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "decimals": 2,
+            "displayName": "Total cost",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 3,
+          "x": 21,
+          "y": 0
+        },
+        "id": 10,
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "center",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {
+            "titleSize": 24,
+            "valueSize": 50
+          },
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "WITH delta_values AS (\nSELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS ts, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n)\nSELECT ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END)*1.09 + SUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END)*1.09\nFROM delta_values\nWHERE ts > '2024-10-31T23:59:00Z'\n\n",
+            "queryType": "table",
+            "rawQueryText": "WITH delta_values AS (\nSELECT strftime('%Y-%m-%dT%H:%M:%S', date_time || 'Z') AS ts, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n)\nSELECT ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END)*1.09 + SUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END)*1.09\nFROM delta_values\nWHERE ts > '2024-10-31T23:59:00Z'\n\n",
+            "refId": "A",
+            "timeColumns": [
+              "time",
+              "ts"
+            ]
+          }
+        ],
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "mode": "lcd",
+                "type": "gauge",
+                "valueDisplayMode": "text"
+              },
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "from": 0,
+                  "result": {
+                    "color": "dark-green",
+                    "index": 0
+                  },
+                  "to": 1120
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 1120,
+                  "result": {
+                    "color": "dark-yellow",
+                    "index": 1
+                  },
+                  "to": 1400
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 1400,
+                  "result": {
+                    "color": "dark-red",
+                    "index": 2
+                  },
+                  "to": 1800
+                },
+                "type": "range"
+              }
+            ],
+            "max": 1800,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "kwatth"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 12,
+          "x": 12,
+          "y": 6
+        },
+        "id": 13,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": false
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT (total_power-5667.54) AS total_usage FROM energy_meter\nORDER BY id DESC\nLIMIT 1",
+            "queryType": "table",
+            "rawQueryText": "SELECT (total_power-5667.54) AS total_usage FROM energy_meter\nORDER BY id DESC\nLIMIT 1",
+            "refId": "A",
+            "timeColumns": [
+              "time",
+              "ts"
+            ]
+          }
+        ],
+        "title": "Energy target",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "dark-orange",
+              "mode": "fixed"
+            },
+            "custom": {
+              "axisBorderShow": true,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 12,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 1,
+            "fieldMinMax": false,
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 10
+        },
+        "id": 1,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT strftime('%s', date_time) AS converted_date, total_power-5667.54 AS total_power FROM energy_meter;",
+            "queryType": "table",
+            "rawQueryText": "SELECT strftime('%s', date_time) AS converted_date, total_power-5667.54 AS total_power FROM energy_meter;",
+            "refId": "A",
+            "timeColumns": [
+              "converted_date"
+            ]
+          }
+        ],
+        "title": "Total power",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "fillOpacity": 82,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineWidth": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 2,
+            "mappings": [
+              {
+                "options": {
+                  "from": 0,
+                  "result": {
+                    "color": "dark-green",
+                    "index": 0
+                  },
+                  "to": 18
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 18,
+                  "result": {
+                    "color": "yellow",
+                    "index": 1
+                  },
+                  "to": 23
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 23,
+                  "result": {
+                    "color": "dark-red",
+                    "index": 2
+                  },
+                  "to": 50
+                },
+                "type": "range"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 10
+        },
+        "id": 3,
+        "options": {
+          "barRadius": 0,
+          "barWidth": 0.81,
+          "fullHighlight": false,
+          "groupWidth": 0.7,
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "orientation": "auto",
+          "showValue": "always",
+          "stacking": "none",
+          "text": {
+            "valueSize": 14
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          },
+          "xField": "converted_date",
+          "xTickLabelRotation": 0,
+          "xTickLabelSpacing": 0
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "SELECT * FROM (\nSELECT strftime('%Y-%m-%dT%H:%M:%SZ', date_time) AS converted_date, MAX(total_power) - MIN(total_power) AS daily_usage FROM energy_meter\nGROUP BY DATE(converted_date)\nORDER BY converted_date DESC\nLIMIT 7)\nORDER BY substr(converted_date,1,10) ASC\n;",
+            "queryType": "table",
+            "rawQueryText": "SELECT * FROM (\nSELECT strftime('%Y-%m-%dT%H:%M:%SZ', date_time) AS converted_date, MAX(total_power) - MIN(total_power) AS daily_usage FROM energy_meter\nGROUP BY DATE(converted_date)\nORDER BY converted_date DESC\nLIMIT 7)\nORDER BY substr(converted_date,1,10) ASC\n;",
+            "refId": "A",
+            "timeColumns": [
+              "converted_date"
+            ]
+          }
+        ],
+        "title": "Daily power consumption",
+        "transformations": [
+          {
+            "id": "formatTime",
+            "options": {
+              "outputFormat": "DD/MM",
+              "timeField": "converted_date",
+              "useTimezone": true
+            }
+          }
+        ],
+        "type": "barchart"
+      },
+      {
+        "datasource": {
+          "type": "frser-sqlite-datasource",
+          "uid": "data-source-uid"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "fillOpacity": 80,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineWidth": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 1,
+            "mappings": [],
+            "noValue": "0",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "#FADE2A",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "day_usage"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "orange",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "night_usage"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "blue",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 12,
+          "y": 19
+        },
+        "id": 6,
+        "options": {
+          "barRadius": 0,
+          "barWidth": 0.84,
+          "fullHighlight": false,
+          "groupWidth": 0.7,
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "orientation": "auto",
+          "showValue": "auto",
+          "stacking": "normal",
+          "text": {
+            "valueSize": 14
+          },
+          "tooltip": {
+            "mode": "multi",
+            "sort": "asc"
+          },
+          "xField": "ts",
+          "xTickLabelRotation": 0,
+          "xTickLabelSpacing": 0
+        },
+        "pluginVersion": "11.3.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "frser-sqlite-datasource",
+              "uid": "data-source-uid"
+            },
+            "queryText": "WITH delta_values AS (\nSELECT date_time, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n)\nSELECT * FROM (\nSELECT strftime('%Y-%m-%dT%H:%M:%SZ', date_time) AS ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END) AS day_usage,\nSUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END) AS night_usage\nFROM delta_values\nGROUP BY DATE(ts)\nORDER BY ts DESC\nLIMIT 7)\nORDER BY substr(ts,1,10) ASC\n\n",
+            "queryType": "table",
+            "rawQueryText": "WITH delta_values AS (\nSELECT date_time, COALESCE(total_power - LAG(total_power) OVER (ORDER BY date_time), total_power) AS delta, tariff\nFROM energy_meter\n)\nSELECT * FROM (\nSELECT strftime('%Y-%m-%dT%H:%M:%SZ', date_time) AS ts, \nSUM(CASE WHEN tariff = 'day' THEN delta ELSE 0 END) AS day_usage,\nSUM(CASE WHEN tariff = 'night' THEN delta ELSE 0 END) AS night_usage\nFROM delta_values\nGROUP BY DATE(ts)\nORDER BY ts DESC\nLIMIT 7)\nORDER BY substr(ts,1,10) ASC\n\n",
+            "refId": "A",
+            "timeColumns": [
+              "ts"
+            ]
+          }
+        ],
+        "title": "Power consumption by day / stacked",
+        "transformations": [
+          {
+            "id": "formatTime",
+            "options": {
+              "outputFormat": "DD/MM",
+              "timeField": "ts",
+              "useTimezone": true
+            }
+          }
+        ],
+        "type": "barchart"
+      }
+    ],
+    "preload": false,
+    "refresh": "5m",
+    "schemaVersion": 40,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "text": "1000",
+            "value": "1000"
+          },
+          "description": "",
+          "hide": 2,
+          "name": "target",
+          "query": "1000",
+          "skipUrlSync": true,
+          "type": "constant"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Energy meter",
+    "uid": "dashboard-uid",
+    "version": 20,
+    "weekStart": ""
+  }
